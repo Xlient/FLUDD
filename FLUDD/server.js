@@ -20,9 +20,7 @@ app.get('/', (req, res) => {
 
 app.post('/sms', (req, res) => {
     const twiml = new MessagingResponse();
-
     twiml.message('Alert dismissed , Thank you for confirming.');
-  
     res.writeHead(200, {'Content-Type': 'text/xml'});
     res.end(twiml.toString());
     
@@ -43,7 +41,8 @@ app.post('/', (req, res) => {
      Water Level : ${waterLevelStatus} ✅
      Water Leaks : ${waterLeakStatus} ❌ \n
 
-     Water is ${waterDistance} ft away from the floor of the basement at ${time} on ${Date.now()}. Please check your Sump pump for possible failure or your basement walls.
+     Water is ${waterDistance} ft away from the floor of the basement at ${time} on ${Date.now()}.
+     \n Please check your Sump pump for possible failure or your basement walls.
 
     `;
   }
