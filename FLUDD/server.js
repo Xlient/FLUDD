@@ -54,7 +54,7 @@ app.post('/', (req, res) => {
   res.status(200);
 })
 
-app.listen(port, () => {
+app.listen(process.env.PORT || 8080, () => {
   console.log('Listening');
   
 
