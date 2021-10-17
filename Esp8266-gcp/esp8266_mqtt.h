@@ -152,6 +152,33 @@ static void setupWifi()
   }
 }
 
+static void PostData(String json)
+{
+  if ((WiFi.status() == WL_CONNECTED)) {
+
+    HTTPClient https;
+
+    Serial.print("[HTTP] begin...\n");
+    https.begin(netClient, "http://fludd-jtf6jloubq-uc.a.run.app/"); //HTTP
+    https.addHeader("Content-Type", "application/json");
+
+     int httpCode = https.POST(json); // posting sensor data to our API
+     
+      if (httpCode < 0 || httpCode != HTTP_CODE_OK) {
+        Serial.printf("[HTTPS] GET... code: %d\n", httpCode);
+        String payload = https.getString();   //Get the request response payload
+        Serial.println(payload);  
+        Serial.println(json);
+      }
+      if (httpCode == HTTP_CODE_OK)
+      { Serial.println("sucess!");
+        }
+      https.end();
+  
+  
+  }
+ }
+
 ///////////////////////////////
 // Orchestrates various methods from preceeding code.
 ///////////////////////////////

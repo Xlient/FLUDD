@@ -14,11 +14,10 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 ////////////////////
 int WaterLevel,
   rainLevel ,
-  Trig,
   Echo;
 
 
- bool rainDetected
+ bool rainDetected;
  char* waterlevelStatus;
  char* waterLeakStatus;
  float waterDistance;
@@ -27,9 +26,8 @@ int WaterLevel,
 /******** Prtotypes  *******/
 
 String toJson();
-char* toJsonSensorData();
-char* calculateDistance(int, int);
-void postData()
+String toJsonSensorData();
+void setWaterDistance();
 
 //*******************************//
 
@@ -53,25 +51,26 @@ void loop()
 
   delay(10); 
 
-while (Serial.available()  < 4 ) 
+while (Serial.available()  < 2 ) 
 {
   digitalWrite(LED_BUILTIN,LOW);
-    delay(1000);
+    delay(100);
   digitalWrite(LED_BUILTIN,HIGH);
 
   
   }
 readSensorData();
 
-  if (millis() - lastMillis > 60000)
+  if (millis() - lastMillis > 6000)
   {
     lastMillis = millis();
     publishTelemetry( toJsonSensorData()); // publish to the G cloud pub sub
-    postData(); // post to our api as well
+    String json = toJson();
+    PostData(json); // post to our api as well
   } 
   
   Serial.println("sent");
-  delay(60000);
+  delay(6000);
   
 }
 
@@ -79,9 +78,9 @@ String toJson()
 {
  StaticJsonDocument<200> doc;
 
-  doc["waterLevelStatus"] = waterlevelStatus 
-  doc["leakStatus"] =  waterLeakStatus
-  doc["waterDistance"] = waterDistance
+  doc["waterLevelStatus"] = waterlevelStatus; 
+  doc["waterLeakStatus"] =  waterLeakStatus;
+  doc["waterDistance"] = waterDistance;
   doc["dateReceived"] = getDateNow();
   doc["timeReceived"] = getTimeNow();
 
@@ -90,18 +89,18 @@ String toJson()
    return json;
 }
 
-char* toJsonSensorData()
+String toJsonSensorData()
 {
   
    StaticJsonDocument<200> doc;
 
   doc["waterLevel"] =  WaterLevel;
   doc["rainLevel"] = rainLevel;
-  doc["waterDistance"] = waterDistance
+  doc["waterDistance"] = waterDistance;
   doc["dateReceived"] = getDateNow();
   doc["timeReceived"] = getTimeNow();
 
-   char* json;
+   String json;
    serializeJson(doc,json);
    return json;
 }
@@ -110,16 +109,15 @@ void readSensorData(){
  
        WaterLevel = Serial.parseInt();
        rainLevel =  Serial.parseInt();
-       Trig = Serial.parseInt();
        Echo = Serial.parseInt();
 
 
-      if (WaterLevel < 80)
+      if (WaterLevel < 6)
       {
         waterlevelStatus  = "All clear";
       }
 
-      else if (WaterLevel > 80 && <= 448)
+      else if (WaterLevel > 6 && WaterLevel<= 9)
       {
         waterlevelStatus  = "Rising water level has been detected";
       }
@@ -128,7 +126,7 @@ void readSensorData(){
         waterlevelStatus  = "High water level has been detected";
       }
 
-      if (rainLevel == 1){
+      if (rainLevel == 0){
         waterLeakStatus = "Water Leak Detected";
       }
 
@@ -150,7 +148,7 @@ String getDateNow()
     return currentDate;
 }
 
-char* getTimeNow()
+String getTimeNow()
 {
     timeClient.update();
     return timeClient.getFormattedTime();
@@ -158,31 +156,13 @@ char* getTimeNow()
 
 void setWaterDistance()
 {
-    float distanceInCm = (0.034 x Echo) / 2;
+    float distanceInCm = (0.034 * Echo) / 2;
 
-    waterDistance =  distanceInCm  x 30.48 // converting to Feet
+    waterDistance = distanceInCm  * 30.48; // converting to Feet
 }
 
 
-void PostData()
-{
-  if ((WiFi.status() == WL_CONNECTED)) {
 
-    WiFiClient client;
-    HTTPClient http;
-
-    Serial.print("[HTTP] begin...\n");
-    http.begin(client, "http://" SERVER_IP "/postplain/"); //HTTP
-    http.addHeader("Content-Type", "application/json");
-
-    http.POST(toJson()) // posting sensor data to our API
-
-    if (httpCode > 0) {
-      // HTTP header has been send and Server response header has been handled
-      Serial.printf("[HTTP] POST... code: %d\n", httpCode);
-      http.end();
-  
-  }
 
 
  
