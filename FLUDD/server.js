@@ -43,7 +43,7 @@ app.post('/', (req, res) => {
      Water Level : ${waterLevelStatus} ✅
      Water Leaks : ${waterLeakStatus} ❌ \n
 
-     Water is ${waterDistance} ft away from the floor of the basement at ${time} on ${date}. Please check your Sump pump for possible failure or your basement walls.
+     Water is ${waterDistance} ft away from the floor of the basement at ${time} on ${Date.now()}. Please check your Sump pump for possible failure or your basement walls.
 
     `;
   }
@@ -55,7 +55,7 @@ app.post('/', (req, res) => {
     msg += `\nPlease respond  with 'OK' to this message in the next 15 minutes to dismiss the alert or an warning call with be made.`;
     const voiceMsg = `
     Hello, This is a automated message by Flood, ${waterLevelStatus} in your basement. 
-     Please check your basement sump pump for failure.
+     Please check your basement sump pump for failure. Goodbye!
     `;
     setTimeout(callUser, 900000, voiceMsg);
   }
