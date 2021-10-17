@@ -1,6 +1,7 @@
 
    
    const int waterLevelsensor = A0;
+   const int waterLevelsensorSwitch = 9;
    const int  trigInput = 31;
    const int echoInput = A1;
    const int rainSesnsor = A2;
@@ -23,10 +24,14 @@
 void setup() {
   
  pinMode(waterLevelsensor,INPUT);
+ pinMode(waterLevelsensorSwitch,OUTPUT)
+
+ digitalWrite(waterLevelsensorSwitch,LOW);
  pinMode(trigPin,OUTPUT);
  pinMode(echoPin,INPUT);
  pinMode(rainSensor,INPUT);
  pinMode(rainSesnorSwitch,OUTPUT);
+ digitalWrite(rainSesnorSwitch,LOW);
 
 
 
@@ -41,16 +46,16 @@ void loop() {
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
-  
+
+  digitalWrite(waterLevelsensorSwitch, HIGH);
+  delay(10);
  WaterLevel = analogRead(waterLevelsensor);
- 
- waterDrops= analogRead(trigPin;
+ waterDrops= analogRead(rainSensor);
  Echo = pulseIn(echoPin, HIGH);
 
    
 Serial.println(WaterLevel);
 Serial.println(waterDrops);
-Serial.println(Trig);
 Serial.println(Echo);
  sendData();
 
@@ -61,7 +66,7 @@ Serial.println(Echo);
 
 void sendData() 
 {
-    Serial1.println('start');
+    Serial1.println("start");
     Serial1.println(WaterLevel);
     Serial1.println(',');
     Serial1.println(waterDrops);

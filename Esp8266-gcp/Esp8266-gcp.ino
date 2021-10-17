@@ -79,12 +79,11 @@ String toJson()
 {
  StaticJsonDocument<200> doc;
 
-  doc["waterLevel"] =  WaterLevel;
   doc["waterLevelStatus"] = waterlevelStatus 
   doc["leakStatus"] =  waterLeakStatus
   doc["waterDistance"] = waterDistance
-  doc["date_received"] = getDateNow();
-  doc["time_received"] = getTimeNow();
+  doc["dateReceived"] = getDateNow();
+  doc["timeReceived"] = getTimeNow();
 
    String json;
    serializeJson(doc,json);
@@ -99,8 +98,8 @@ char* toJsonSensorData()
   doc["waterLevel"] =  WaterLevel;
   doc["rainLevel"] = rainLevel;
   doc["waterDistance"] = waterDistance
-  doc["date_received"] = getDateNow();
-  doc["time_received"] = getTimeNow();
+  doc["dateReceived"] = getDateNow();
+  doc["timeReceived"] = getTimeNow();
 
    char* json;
    serializeJson(doc,json);
@@ -113,7 +112,30 @@ void readSensorData(){
        rainLevel =  Serial.parseInt();
        Trig = Serial.parseInt();
        Echo = Serial.parseInt();
-      
+
+
+      if (WaterLevel < 80)
+      {
+        waterlevelStatus  = "All clear";
+      }
+
+      else if (WaterLevel > 80 && <= 448)
+      {
+        waterlevelStatus  = "Rising water level has been detected";
+      }
+       else 
+      {
+        waterlevelStatus  = "High water level has been detected";
+      }
+
+      if (rainLevel == 1){
+        waterLeakStatus = "Water Leak Detected";
+      }
+
+      else
+      {
+         waterLeakStatus = "All clear";
+      }
 }
 
 String getDateNow()
